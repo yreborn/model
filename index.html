@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>模特排行榜</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        .app {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .search-container {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: #f9f9f9;
+            border-radius: 25px;
+            padding: 0 15px;
+            height: 50px;
+            border: 1px solid #eee;
+        }
+        .search-icon {
+            color: #999;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            outline: none;
+        }
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .model-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .model-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .rank-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(0,0,0,0.6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            z-index: 10;
+        }
+        .rank-1 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        .rank-2 {
+            background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+            box-shadow: 0 0 10px rgba(192,192,192,0.5);
+        }
+        .rank-3 {
+            background: linear-gradient(135deg, #CD7F32, #8B4513);
+            box-shadow: 0 0 10px rgba(205,127,50,0.5);
+        }
+        .model-image-container {
+            position: relative;
+            height: 350px;
+            overflow: hidden;
+        }
+        .model-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        .model-image-container:hover .model-image {
+            transform: scale(1.05);
+        }
+        .model-info {
+            padding: 20px;
+        }
+        .model-name {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .model-details {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #666;
+        }
+        .model-zodiac {
+            display: flex;
+            align-items: center;
+        }
+        .zodiac-icon {
+            margin-right: 5px;
+        }
+        .vote-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .vote-count {
+            font-size: 18px;
+            font-weight: 500;
+            color: #6a11cb;
+        }
+        .vote-btn {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .vote-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .add-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 100;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .add-btn:hover {
+            transform: scale(1.1);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            margin: 50px auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #6a11cb;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .form-control:focus {
+            border-color: #6a11cb;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(106,17,203,0.1);
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #999;
+        }
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .app {
+                padding: 10px;
+            }
+            .models-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+        @media (max-width: 480px) {
+            .models-grid {
+                grid-template-columns: 1fr;
+            }
+            .model-image-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="header">
+            <h1>模特排行榜</h1>
+            <p>为你喜欢的模特投票吧！</p>
+        </div>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="search-input" placeholder="搜索模特..." oninput="searchModels()">
+            </div>
+        </div>
+        
+        <div class="models-grid" id="models-container">
+            <!-- 模特卡片将在这里动态生成 -->
+        </div>
+        
+        <button class="add-btn" onclick="openAddModal()">+</button>
+        
+        <!-- 添加模特弹窗 -->
+        <div id="add-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">添加模特</div>
+                    <button class="close-btn" onclick="closeAddModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label" for="input-name">名称</label>
+                        <input type="text" id="input-name" class="form-control" placeholder="请输入模特名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="input-avatar">头像URL</label>
+                        <input type="text" id="input-avatar" class="form-control" placeholder="请输入头像图片链接">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="input-zodiac">星座</label>
+                        <input type="text" id="input-zodiac" class="form-control" placeholder="请输入星座">
+                    </div>
+                    <button class="btn-submit" onclick="addModel()">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 从localStorage获取模特列表
+        let models = JSON.parse(localStorage.getItem('modelRanking')) || [
+            {
+                id: 1,
+                name: "Emma Johnson",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=700&q=80",
+                zodiac: "天秤座",
+                votes: 128
+            },
+            {
+                id: 2,
+                name: "Sophia Chen",
+                avatar: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=700&q=80",
+                zodiac: "双子座",
+                votes: 105
+            },
+            {
+                id: 3,
+                name: "Olivia Davis",
+                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=700&q=80",
+                zodiac: "射手座",
+                votes: 97
+            }
+        ];
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            renderModels();
+        };
+        
+        // 渲染模特列表
+        function renderModels(filteredModels = null) {
+            const container = document.getElementById('models-container');
+            
+            // 使用过滤后的列表或原始列表
+            const modelsToRender = filteredModels || models;
+            
+            // 按票数排序
+            const sortedModels = [...modelsToRender].sort((a, b) => b.votes - a.votes);
+            
+            if (sortedModels.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👗</div>
+                        <div>暂无模特，点击右下角添加</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            sortedModels.forEach((model, index) => {
+                const rankClass = index < 3 ? `rank-${index + 1}` : '';
+                
+                const modelElement = document.createElement('div');
+                modelElement.className = 'model-card';
+                
+                modelElement.innerHTML = `
+                    <div class="model-image-container">
+                        <div class="rank-badge ${rankClass}">${index + 1}</div>
+                        <img src="${model.avatar}" alt="${model.name}" class="model-image" onerror="this.src='https://via.placeholder.com/350x500?text=无法加载图片'">
+                    </div>
+                    <div class="model-info">
+                        <div class="model-name">${model.name}</div>
+                        <div class="model-details">
+                            <div class="model-zodiac">
+                                <span class="zodiac-icon">✨</span>
+                                <span>${model.zodiac}</span>
+                            </div>
+                        </div>
+                        <div class="vote-section">
+                            <div class="vote-count">${model.votes} 票</div>
+                            <button class="vote-btn" onclick="voteForModel(${model.id})">投票</button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(modelElement);
+            });
+        }
+        
+        // 搜索模特
+        function searchModels() {
+            const searchText = document.getElementById('search-input').value.toLowerCase().trim();
+            
+            if (!searchText) {
+                renderModels();
+                return;
+            }
+            
+            const filtered = models.filter(model => 
+                model.name.toLowerCase().includes(searchText) || 
+                model.zodiac.toLowerCase().includes(searchText)
+            );
+            
+            renderModels(filtered);
+        }
+        
+        // 为模特投票
+        function voteForModel(modelId) {
+            const model = models.find(m => m.id === modelId);
+            if (model) {
+                model.votes += 1;
+                saveAndRender();
+                
+                // 创建一个浮动的投票动画
+                const voteAnimation = document.createElement('div');
+                voteAnimation.textContent = '+1';
+                voteAnimation.style.position = 'fixed';
+                voteAnimation.style.color = '#6a11cb';
+                voteAnimation.style.fontWeight = 'bold';
+                voteAnimation.style.fontSize = '24px';
+                voteAnimation.style.pointerEvents = 'none';
+                voteAnimation.style.zIndex = '9999';
+                voteAnimation.style.transition = 'all 1s ease-out';
+                
+                // 获取点击位置
+                const event = window.event;
+                voteAnimation.style.left = `${event.clientX - 10}px`;
+                voteAnimation.style.top = `${event.clientY - 20}px`;
+                
+                document.body.appendChild(voteAnimation);
+                
+                // 动画效果
+                setTimeout(() => {
+                    voteAnimation.style.transform = 'translateY(-50px)';
+                    voteAnimation.style.opacity = '0';
+                }, 50);
+                
+                // 移除元素
+                setTimeout(() => {
+                    document.body.removeChild(voteAnimation);
+                }, 1000);
+            }
+        }
+        
+        // 打开添加模特弹窗
+        function openAddModal() {
+            document.getElementById('add-modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // 关闭添加模特弹窗
+        function closeAddModal() {
+            document.getElementById('add-modal').style.display = 'none';
+            document.body.style.overflow = '';
+            
+            // 清空表单
+            document.getElementById('input-name').value = '';
+            document.getElementById('input-avatar').value = '';
+            document.getElementById('input-zodiac').value = '';
+        }
+        
+        // 添加模特
+        function addModel() {
+            const name = document.getElementById('input-name').value.trim();
+            const avatar = document.getElementById('input-avatar').value.trim();
+            const zodiac = document.getElementById('input-zodiac').value.trim();
+            
+            if (!name) {
+                alert('请至少填写模特名称！');
+                return;
+            }
+            
+            const newModel = {
+                id: Date.now(),
+                name: name,
+                avatar: avatar || 'https://via.placeholder.com/350x500?text=无头像',
+                zodiac: zodiac || '未知',
+                votes: 0
+            };
+            
+            models.push(newModel);
+            saveAndRender();
+            closeAddModal();
+            
+            // 清空搜索框
+            document.getElementById('search-input').value = '';
+            
+            alert('模特添加成功！');
+        }
+        
+        // 保存数据并重新渲染
+        function saveAndRender() {
+            localStorage.setItem('modelRanking', JSON.stringify(models));
+            
+            // 检查是否有搜索文本
+            const searchText = document.getElementById('search-input').value.toLowerCase().trim();
+            if (searchText) {
+                searchModels();
+            } else {
+                renderModels();
+            }
+        }
+        
+        // 关闭弹窗的其他方式
+        window.onclick = function(event) {
+            const modal = document.getElementById('add-modal');
+            if (event.target === modal) {
+                closeAddModal();
+            }
+        };
+    </script>
+</body>
+</html>
